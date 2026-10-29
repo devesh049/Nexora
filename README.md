@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Nexora
 
 Nexora is a Next.js App Router digital-services application. Browser tools run locally. Account registration, credentials authentication, and profile storage use the configured managed PostgreSQL database. The application catalog, billing, email verification/recovery, AI providers, and public API-key service are not operational; the relevant screens are marked as previews.
@@ -57,3 +58,6 @@ Never put secrets in `NEXT_PUBLIC_*` variables or commit populated environment f
 - Configure trusted proxy IP forwarding for the persistent auth rate limiter and confirm your deployment's Auth.js host/cookie configuration.
 - Set up backups, restoration tests, error monitoring, log retention, and database migration rollback procedures.
 - Add and test email, AI, billing, and storage adapters before advertising those features. Do not represent draft legal pages, sample application routes, or example API endpoints as live services.
+=======
+# Nexora
+>>>>>>> f0a972c14fe276dd1643b6aeedd8b8aed2ba0e52
