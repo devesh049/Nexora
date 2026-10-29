@@ -1,0 +1,85 @@
+import type { Tool } from "@/types";
+
+export const tools: Tool[] = [
+  {
+    id: "json-formatter",
+    name: "JSON Formatter",
+    description: "Format, validate, and beautify JSON data",
+    icon: "Braces",
+    category: "Developer",
+    href: "/tools/json-formatter",
+  },
+  {
+    id: "base64-encoder",
+    name: "Base64 Encoder",
+    description: "Encode and decode Base64 strings",
+    icon: "Binary",
+    category: "Developer",
+    href: "/tools/base64-encoder",
+  },
+  {
+    id: "text-case-converter",
+    name: "Text Case Converter",
+    description: "Convert text between different cases",
+    icon: "CaseSensitive",
+    category: "Text",
+    href: "/tools/text-case-converter",
+  },
+  {
+    id: "word-counter",
+    name: "Word Counter",
+    description: "Count words, characters, and sentences",
+    icon: "Type",
+    category: "Text",
+    href: "/tools/word-counter",
+  },
+  {
+    id: "url-encoder",
+    name: "URL Encoder",
+    description: "Encode and decode URL strings",
+    icon: "Link",
+    category: "Developer",
+    href: "/tools/url-encoder",
+  },
+  {
+    id: "qr-generator",
+    name: "QR Code Generator",
+    description: "Generate QR codes for URLs and text",
+    icon: "QrCode",
+    category: "Utilities",
+    href: "/tools/qr-generator",
+  },
+  {
+    id: "password-generator",
+    name: "Password Generator",
+    description: "Generate secure random passwords",
+    icon: "Key",
+    category: "Security",
+    href: "/tools/password-generator",
+  },
+  {
+    id: "color-picker",
+    name: "Color Picker",
+    description: "Pick and convert colors between formats",
+    icon: "Palette",
+    category: "Design",
+    href: "/tools/color-picker",
+  },
+  {
+    id: "uuid-generator",
+    name: "UUID Generator",
+    description: "Generate unique identifiers (UUIDs)",
+    icon: "Hash",
+    category: "Developer",
+    href: "/tools/uuid-generator",
+  },
+];
+
+export const toolCategories = [
+  "All",
+  "Developer",
+  "Text",
+  "Utilities",
+  "Security",
+  "Design",
+] as const;

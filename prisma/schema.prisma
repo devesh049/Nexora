@@ -1,0 +1,231 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String          @id @default(cuid())
+  name          String
+  email         String          @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String
+  status        AccountStatus   @default(ACTIVE)
+  role          UserRole        @default(USER)
+  profile       UserProfile?
+  favorites     Favorite[]
+  activities    UserActivity[]
+  subscriptions Subscription[]
+  apiKeys       ApiKey[]
+  usageRecords  UsageRecord[]
+  auditLogs     AuditLog[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  @@index([status, createdAt])
+}
+
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  preferences Json     @default("{}")
+  theme       String   @default("system")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Application {
+  id          String            @id @default(cuid())
+  name        String
+  slug        String            @unique
+  description String
+  category    String
+  icon        String?
+  image       String?
+  destination String?
+  visibility  Visibility        @default(PUBLIC)
+  status      PublicationStatus @default(DRAFT)
+  requiredPlan Plan             @default(FREE)
+  favorites   Favorite[]
+  activities  UserActivity[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([status, visibility, category])
+}
+
+model ToolCatalogItem {
+  id          String            @id @default(cuid())
+  name        String
+  slug        String            @unique
+  description String
+  category    String
+  icon        String?
+  route       String            @unique
+  status      PublicationStatus @default(PUBLISHED)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@index([status, category])
+}
+
+model Favorite {
+  id            String      @id @default(cuid())
+  userId        String
+  applicationId String?
+  toolSlug      String?
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+
+  @@unique([userId, applicationId])
+  @@unique([userId, toolSlug])
+  @@index([userId, createdAt])
+}
+
+model UserActivity {
+  id            String       @id @default(cuid())
+  userId        String
+  type          ActivityType
+  applicationId String?
+  toolSlug      String?
+  metadata      Json         @default("{}")
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  application   Application? @relation(fields: [applicationId], references: [id], onDelete: SetNull)
+  createdAt     DateTime     @default(now())
+
+  @@index([userId, createdAt])
+  @@index([type, createdAt])
+}
+
+model Subscription {
+  id                     String             @id @default(cuid())
+  userId                 String
+  plan                   Plan               @default(FREE)
+  status                 SubscriptionStatus @default(INACTIVE)
+  providerCustomerId     String?
+  providerSubscriptionId String?            @unique
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+
+  @@index([userId, status])
+}
+
+model ApiKey {
+  id          String      @id @default(cuid())
+  userId      String
+  name        String
+  prefix      String      @unique
+  hashedKey   String      @unique
+  permissions String[]
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  revokedAt   DateTime?
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  usageRecords UsageRecord[]
+  createdAt   DateTime    @default(now())
+
+  @@index([userId, revokedAt])
+}
+
+model UsageRecord {
+  id         String   @id @default(cuid())
+  userId     String
+  apiKeyId   String?
+  resource   String
+  quantity   Int      @default(1)
+  metadata   Json     @default("{}")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiKey     ApiKey?  @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  createdAt  DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([apiKeyId, createdAt])
+  @@index([resource, createdAt])
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  actorUserId  String?
+  action       String
+  resourceType String
+  resourceId   String?
+  metadata     Json     @default("{}")
+  actor        User?    @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+
+  @@index([actorUserId, createdAt])
+  @@index([resourceType, resourceId, createdAt])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  @@index([email, expiresAt])
+}
+
+model RateLimitBucket {
+  key       String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+  updatedAt DateTime @updatedAt
+
+  @@index([expiresAt])
+}
+
+enum AccountStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum Visibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum PublicationStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum Plan {
+  FREE
+  PRO
+  TEAM
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  INACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+enum ActivityType {
+  APP_OPENED
+  TOOL_OPENED
+  PROFILE_UPDATED
+  API_KEY_CREATED
+  API_KEY_REVOKED
+}
